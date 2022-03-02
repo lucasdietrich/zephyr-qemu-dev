@@ -1,0 +1,118 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "options": {
+        "env": {
+            "venvPath": "../.venv",
+            "westPath": "../.venv/bin/west",
+        }
+    },
+    "tasks": [
+        {
+            "label": "(QEMU) Build",
+            "type": "shell",
+            "command": "${westPath} build",
+            "args": [
+
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "(QEMU) run",
+            "type": "shell",
+            "command": "${westPath} build -t run",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Ninja debugserver",
+            "type": "shell",
+            // "options": {
+            //     "cwd": "${workspaceRoot}/build"
+            // },
+			"command": "ninja debugserver -C build -v",
+            "group": "build",
+            "args": [
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "focus": true,
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+			"command": "rm -rf ${workspaceFolder}/build",
+            "group": "build",
+            "args": [
+            ],
+            "presentation": {
+                "echo": false,
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "(x86) Readelf",
+            "type": "shell",
+            "command": "readelf -a ${workspaceFolder}/build/zephyr/zephyr.elf > readelf.txt",
+            "group": "build",
+            "presentation": {
+                "echo": false,
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "(x86) Disassembly",
+            "type": "shell",
+            "command": "objdump -S ${workspaceFolder}/build/zephyr/zephyr.elf > disassembly.S",
+            "group": "build",
+            "presentation": {
+                "echo": false,
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Activate Python venv",
+            "type": "shell",
+            "command": "source ${venvPath}/bin/activate && sh",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "close": false,
+                "focus": true,
+                "echo": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "... TODO",
+            "type": "shell",
+            "command": "west build -t run",
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceRoot}/build"
+            },
+            "windows": {
+                "command": "${workspaceFolder}\\scripts\\readelf-vs.bat"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ]
+}

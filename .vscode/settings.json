@@ -1,0 +1,20 @@
+{
+    "python.pythonPath": "../.venv/bin/python",
+    "files.associations": {
+        "*.asm": "avr",
+        "kernel.h": "c",
+        "kernel_includes.h": "c",
+        "syscall.h": "c",
+        "kernel_version.h": "c",
+        "zephyr.h": "c",
+        "func.h": "c",
+        "sched_priq.h": "c",
+        "wait_q.h": "c",
+        "log.h": "c",
+        "ksched.h": "c",
+        "kernel_internal.h": "c",
+        "kernel_arch_interface.h": "c",
+        "kernel_arch_func.h": "c",
+        "cache.h": "c"
+    }
+}
