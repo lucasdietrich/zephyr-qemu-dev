@@ -15,6 +15,12 @@
         "kernel_internal.h": "c",
         "kernel_arch_interface.h": "c",
         "kernel_arch_func.h": "c",
-        "cache.h": "c"
+        "cache.h": "c",
+        "socket.h": "c",
+        "dns_resolve.h": "c",
+        "socket_select.h": "c",
+        "socket_types.h": "c",
+        "tp.h": "c",
+        "json.h": "c"
     }
 }

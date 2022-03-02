@@ -6,6 +6,7 @@
         "env": {
             "venvPath": "../.venv",
             "westPath": "../.venv/bin/west",
+            "netToolsPath": "../net-tools",
         }
     },
     "tasks": [
@@ -31,6 +32,28 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "(QEMU) loop socat",
+            "type": "shell",
+            "command": "${netToolsPath}/loop-socat.sh",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "(QEMU) loop slip tap (SUDO)",
+            "type": "shell",
+            "command": "sudo ${netToolsPath}/loop-slip-tap.sh",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated"
             },
             "problemMatcher": []
         },

@@ -29,11 +29,7 @@ west init -m https://github.com/lucasdietrich/zephyr-qemu-dev --mr main my-works
 
 Open tasks panel with `Ctrl + Maj + B`
 
-## Debug
-
-Launch `Ninja debugserver` task and press `F5`
-
-## Expected output
+## Run : Expected output
 
 ```
 -- west build: running target run
@@ -45,6 +41,12 @@ Booting from ROM..*** Booting Zephyr OS build zephyr-v2.7.1-87-g798cca3d61a5  **
 [2020] Hello from QEMU !
 [3030] Hello from QEMU !
 ```
+
+## Debug
+
+Launch `Ninja debugserver` task and press `F5`
+
+## Networking
 
 ## Known issues
 
