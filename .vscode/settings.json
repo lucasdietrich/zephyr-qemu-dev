@@ -1,5 +1,6 @@
 {
     "python.pythonPath": "../.venv/bin/python",
+    "tasks.statusbar.default.hide": true,
     "files.associations": {
         "*.asm": "avr",
         "kernel.h": "c",

@@ -11,7 +11,8 @@
     },
     "tasks": [
         {
-            "label": "(QEMU) Build",
+            "label": "Build",
+            "detail": "Build for QEMU",
             "type": "shell",
             "command": "${westPath} build",
             "args": [
@@ -22,10 +23,16 @@
                 "reveal": "always",
                 "panel": "dedicated"
             },
+            "options": {
+                "statusbar": {
+                    "hide": false
+                }
+            },
             "problemMatcher": []
         },
         {
-            "label": "(QEMU) run",
+            "label": "Run",
+            "detail": "Run for QEMU",
             "type": "shell",
             "command": "${westPath} build -t run",
             "group": "build",
@@ -33,13 +40,17 @@
                 "reveal": "always",
                 "panel": "new"
             },
+            "options": {
+                "statusbar": {
+                    "hide": false
+                }
+            },
             "problemMatcher": []
         },
         {
             "label": "(QEMU) loop socat",
             "type": "shell",
             "command": "${netToolsPath}/loop-socat.sh",
-            "group": "build",
             "presentation": {
                 "reveal": "silent",
                 "panel": "dedicated",
@@ -50,7 +61,6 @@
             "label": "(QEMU) loop slip tap (SUDO)",
             "type": "shell",
             "command": "sudo ${netToolsPath}/loop-slip-tap.sh",
-            "group": "build",
             "presentation": {
                 "reveal": "silent",
                 "panel": "dedicated",
@@ -59,13 +69,19 @@
             "problemMatcher": []
         },
         {
-            "label": "Ninja debugserver",
+            "label": "Run DBG srv",
+            "group": "build",
+            "detail": "Prepare debugserver for QEMU. Press F5",
             "type": "shell",
             // "options": {
             //     "cwd": "${workspaceRoot}/build"
             // },
+            "options": {
+                "statusbar": {
+                    "hide": false
+                }
+            },
 			"command": "ninja debugserver -C build -v",
-            "group": "build",
             "args": [
             ],
             "presentation": {
@@ -91,7 +107,6 @@
             "label": "(x86) Readelf",
             "type": "shell",
             "command": "readelf -a ${workspaceFolder}/build/zephyr/zephyr.elf > readelf.txt",
-            "group": "build",
             "presentation": {
                 "echo": false,
             },
@@ -101,7 +116,6 @@
             "label": "(x86) Disassembly",
             "type": "shell",
             "command": "objdump -S ${workspaceFolder}/build/zephyr/zephyr.elf > disassembly.S",
-            "group": "build",
             "presentation": {
                 "echo": false,
             },
