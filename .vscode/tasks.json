@@ -42,7 +42,7 @@
             "group": "build",
             "presentation": {
                 "reveal": "silent",
-                "panel": "dedicated"
+                "panel": "dedicated",
             },
             "problemMatcher": []
         },
@@ -53,7 +53,8 @@
             "group": "build",
             "presentation": {
                 "reveal": "silent",
-                "panel": "dedicated"
+                "panel": "dedicated",
+                "focus": true
             },
             "problemMatcher": []
         },

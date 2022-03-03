@@ -10,7 +10,6 @@
             "name": "Demo",
             "includePath": [
                 "src",
-                "inc",
                 "${buildDirectory}/zephyr/include/generated",
                 "${zephyrDirectory}/include",
                 "${zephyrDirectory}/kernel/include/**",
