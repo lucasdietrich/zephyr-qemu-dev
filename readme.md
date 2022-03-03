@@ -46,7 +46,17 @@ Run or debug the application normally
 
 ## Run : Expected output
 
-![zephyr_qemu_networking_debug.png](./pics/zephyr_qemu_networking_debug.png)
+```
+> Executing task: ${westPath} build -t run <
+
+-- west build: running target run
+[0/1] To exit from QEMU enter: 'CTRL+a, x'[QEMU] CPU: qemu32,+nx,+pae
+SeaBIOS (version zephyr-v1.0.0-0-g31d4e0e-dirty-20200714_234759-fv-az50-zephyr)
+Booting from ROM..*** Booting Zephyr OS build zephyr-v2.7.1  ***
+(1) Hello world !
+(2) Hello world !
+(3) Hello world !
+```
 
 ## Known issues
 
