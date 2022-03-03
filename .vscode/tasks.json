@@ -62,7 +62,7 @@
             "type": "shell",
             "command": "sudo ${netToolsPath}/loop-slip-tap.sh",
             "presentation": {
-                "reveal": "silent",
+                "reveal": "always",
                 "panel": "dedicated",
                 "focus": true
             },
@@ -132,23 +132,6 @@
                 "close": false,
                 "focus": true,
                 "echo": true
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "... TODO",
-            "type": "shell",
-            "command": "west build -t run",
-            "group": "build",
-            "options": {
-                "cwd": "${workspaceRoot}/build"
-            },
-            "windows": {
-                "command": "${workspaceFolder}\\scripts\\readelf-vs.bat"
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
             },
             "problemMatcher": []
         }
