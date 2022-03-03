@@ -59,3 +59,5 @@ Run or debug the application normally
 - Clean `build` folder if strange error appear
 
 - If closing `loop-slip-tap.sh` by error, kill processes locking the fd using `sudo lsof | grep slip` and relaunch
+
+- Make sure to change manifest path to `zephyr-qemu-dev` in workspace `.west/config` file.
