@@ -1,5 +1,7 @@
 # Zephyr RTOS and QEMU emulator
 
+TODO : [Setting up Zephyr and NAT/masquerading on host to access Internet¶](https://docs.zephyrproject.org/latest/guides/networking/qemu_setup.html#setting-up-zephyr-and-nat-masquerading-on-host-to-access-internet)
+
 ## Ressources :
 
 - [Zephyr CMake Package - Zephyr Build Configuration CMake package](https://docs.zephyrproject.org/latest/guides/zephyr_cmake_package.html#cmake-build-config-package)
