@@ -20,7 +20,7 @@ TODO : [Setting up Zephyr and NAT/masquerading on host to access Internet¶](htt
 - [QEMU wiki](https://wiki.qemu.org/Main_Page)
 - [GDB: The GNU Project Debugger](https://www.sourceware.org/gdb/)
 - [VS Code - Debugging](https://code.visualstudio.com/docs/editor/debugging)
-
+- [NAT/masquerading on host to access Internet](https://docs.zephyrproject.org/latest/guides/networking/qemu_setup.html#id11)
 ## Import this project using west
 
 ```
@@ -45,6 +45,13 @@ In order to run/debug the networking application
 And keep the consoles over sessions
 
 Run or debug the application normally
+
+NAT/masquerading on host to access Internet :
+
+```
+iptables -t nat -A POSTROUTING -j MASQUERADE -s 192.0.2.1
+sysctl -w net.ipv4.ip_forward=1
+```
 
 ## Run : Expected output
 
