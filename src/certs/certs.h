@@ -1,10 +1,16 @@
 #ifndef _DEVICE_CERTS_H_
 #define _DEVICE_CERTS_H_
 
-extern const char *ca_cert;
+static const char ca_cert[] = {
+	#include "ca_cert.cer"
+};
 
-extern const char *private_key;
+static const char private_key[] = {
+	#include "private_key.cer"
+};
 
-extern const char *public_key;
+static const char public_cert[] = {
+	#include "public_cert.cer"
+};
 
 #endif /* _DEVICE_CERTS_H_ */

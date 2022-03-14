@@ -3,6 +3,17 @@ mainmenu "Networking ZEPHYR QEMU AWS MQTT sample application"
 config CLOUD_AWS_HOSTNAME
 	string "AWS MQTT hostname"
 	help
-	  Username of your Azure account.
+		Hostname of the AWS MQTT broker.
+
+config CLOUD_AWS_PORT
+	int "AWS MQTT port"
+	default 8883
+	help
+		Port of the AWS MQTT broker.
+
+config CLOUD_AWS_DEVICE_NAME
+	string "AWS Device name"
+	help
+		Name of the device.
 
 source "Kconfig.zephyr"

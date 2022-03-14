@@ -1,5 +1,7 @@
 # Zephyr RTOS and QEMU emulator
 
+See [**AWS specific readme**](./aws.md)
+
 ## Ressources :
 
 - [Zephyr CMake Package - Zephyr Build Configuration CMake package](https://docs.zephyrproject.org/latest/guides/zephyr_cmake_package.html#cmake-build-config-package)

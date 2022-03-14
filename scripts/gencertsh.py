@@ -1,10 +1,10 @@
 import os
 
 def text_to_string(filename: str, varname: str = "certificate_pem"):
-    out = f"const char {varname}[] = \n\t\""
+    out = "\""
     with open(filename, "r+") as fp:
-        out += "\\r\\n\"\n\t\"".join(line.strip() for line in fp.readlines())
-    out += "\";\n"
+        out += "\\r\\n\"\n\"".join(line.strip() for line in fp.readlines())
+    out += "\\r\\n\"\n"
     return out
 
 def list_files(directory: str, extension: str = "-certificate.pem.crt"):
@@ -32,7 +32,7 @@ def generate_certificates_headers(directory: str = "./certs"):
     assert all(certificates.values())
 
     for name, certfile in certificates.items():
-        filename = f"./src/certs/{name}.c"
+        filename = f"./src/certs/{name}.cer"
         with open(filename, "w+") as fp:
             print(f"Generating {filename}")
             fp.write(text_to_string(certfile, name))

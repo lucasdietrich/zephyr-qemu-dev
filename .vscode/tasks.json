@@ -69,6 +69,15 @@
             "problemMatcher": []
         },
         {
+            "label": "(QEMU) iptable MASQUERADE (SUDO)",
+            "type": "shell",
+            "command": "sudo iptables -t nat -A POSTROUTING -j MASQUERADE -s 192.0.2.1 && sudo sysctl -w net.ipv4.ip_forward=1",
+            "presentation": {
+                "echo": false
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Run DBG srv",
             "group": "build",
             "detail": "Prepare debugserver for QEMU. Press F5",
