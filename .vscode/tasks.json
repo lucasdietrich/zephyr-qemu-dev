@@ -92,14 +92,36 @@
             "problemMatcher": []
         },
         {
-            "label": "clean",
+            "label": "Clean",
             "type": "shell",
 			"command": "rm -rf ${workspaceFolder}/build",
             "group": "build",
             "args": [
             ],
+            "options": {
+                "statusbar": {
+                    "hide": false
+                }
+            },
             "presentation": {
                 "echo": false,
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "gencertsh.py",
+            "type": "shell",
+			"command": "python3 ./scripts/gencertsh.py",
+            "group": "build",
+            "args": [
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "focus": false,
             },
             "problemMatcher": []
         },

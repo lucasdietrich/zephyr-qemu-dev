@@ -1,7 +1,5 @@
 # Zephyr RTOS and QEMU emulator
 
-TODO : [Setting up Zephyr and NAT/masquerading on host to access Internet¶](https://docs.zephyrproject.org/latest/guides/networking/qemu_setup.html#setting-up-zephyr-and-nat-masquerading-on-host-to-access-internet)
-
 ## Ressources :
 
 - [Zephyr CMake Package - Zephyr Build Configuration CMake package](https://docs.zephyrproject.org/latest/guides/zephyr_cmake_package.html#cmake-build-config-package)
@@ -11,7 +9,7 @@ TODO : [Setting up Zephyr and NAT/masquerading on host to access Internet¶](htt
 - [VS Code integration #21119](https://github.com/zephyrproject-rtos/zephyr/issues/21119)
 - [West (Zephyr’s meta-tool)](https://docs.zephyrproject.org/latest/guides/west/index.html)
 - [West Manifests](https://docs.zephyrproject.org/latest/guides/west/manifest.html)
-- [Moving to West¶](https://docs.zephyrproject.org/latest/guides/west/moving-to-west.html)
+- [Moving to West](https://docs.zephyrproject.org/latest/guides/west/moving-to-west.html)
 - [Workspaces](https://docs.zephyrproject.org/latest/guides/west/workspaces.html)
   - [T2: Star topology, application is the manifest repository](https://docs.zephyrproject.org/latest/guides/west/workspaces.html#west-t2)
 - [Zephyr RTOS Development in Linux](https://github.com/bus710/zephyr-rtos-development-in-linux)
@@ -49,8 +47,8 @@ Run or debug the application normally
 NAT/masquerading on host to access Internet :
 
 ```
-iptables -t nat -A POSTROUTING -j MASQUERADE -s 192.0.2.1
-sysctl -w net.ipv4.ip_forward=1
+sudo iptables -t nat -A POSTROUTING -j MASQUERADE -s 192.0.2.1
+sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
 ## Run : Expected output

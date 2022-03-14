@@ -22,6 +22,8 @@
         "socket_select.h": "c",
         "socket_types.h": "c",
         "tp.h": "c",
-        "json.h": "c"
+        "json.h": "c",
+        "mqtt.h": "c",
+        "time.h": "c"
     }
 }
