@@ -1,0 +1,8 @@
+mainmenu "Networking ZEPHYR QEMU AWS MQTT sample application"
+
+config CLOUD_AWS_HOSTNAME
+	string "AWS MQTT hostname"
+	help
+	  Username of your Azure account.
+
+source "Kconfig.zephyr"

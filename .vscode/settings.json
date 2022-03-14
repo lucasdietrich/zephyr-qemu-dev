@@ -24,6 +24,8 @@
         "tp.h": "c",
         "json.h": "c",
         "mqtt.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c"
     }
 }
