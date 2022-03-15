@@ -20,7 +20,29 @@
 #include "certs/certs.h"
 
 #include <logging/log.h>
-LOG_MODULE_REGISTER(aws_client, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(aws_client, LOG_LEVEL_INF);
+
+/*___________________________________________________________________________*/
+
+typedef struct {
+	uint8_t *data;
+	size_t len;
+} buffer_t;
+
+/*___________________________________________________________________________*/
+
+static struct sockaddr_in broker;
+
+static uint8_t rx_buffer[256];
+static uint8_t tx_buffer[256];
+
+static uint8_t payload_buffer[CONFIG_CLOUD_AWS_PAYLOAD_BUFFER_SIZE];
+
+static struct mqtt_client client_ctx;
+
+const char mqtt_client_name[] = "zephyr_qemu_aws_mqtt_client";
+
+atomic_t mqtt_connected = ATOMIC_INIT(0);
 
 /*___________________________________________________________________________*/
 
@@ -69,44 +91,227 @@ exit:
 
 /*___________________________________________________________________________*/
 
-static struct sockaddr_in broker;
+#define TOPIC1 (CONFIG_CLOUD_AWS_DEVICE_NAME "/testTopic1")
+#define TOPIC2 (CONFIG_CLOUD_AWS_DEVICE_NAME "/testTopic2")
 
-static uint8_t rx_buffer[4096];
-static uint8_t tx_buffer[4096];
+int subscribe_on_connect(void)
+{
+	int ret;
 
-static struct mqtt_client client_ctx;
+	/* suscribe on topics composed on device name and `testTopic` 1 or 2
+	 * "zephyr-qemu-aws-device/testTopic1"
+	 */
 
-const char mqtt_client_name[] = "zephyr_qemu_aws_mqtt_client";
+	struct mqtt_topic topics[2] = {
+		{
+			.topic = {
+				.utf8 = TOPIC1,
+				.size = sizeof(TOPIC1) - 1
+			},
+			.qos = CONFIG_CLOUD_AWS_QOS, 
+		},
+		{
+			.topic = {
+				.utf8 = TOPIC2,
+				.size = sizeof(TOPIC2) - 1
+			},
+			.qos = CONFIG_CLOUD_AWS_QOS,
+		},
+	};
+
+	struct mqtt_subscription_list sub_list = {
+		.list = topics,
+		.list_count = ARRAY_SIZE(topics),
+		.message_id = 1u /* first MQTT message */
+	};
+
+	LOG_INF("Subscribing to %hu topics", sub_list.list_count);
+
+	ret = mqtt_subscribe(&client_ctx, &sub_list);
+	if (ret != 0) {
+		LOG_ERR("Failed to subscribe to topics: %d", ret);
+	}
+
+	return ret;
+}
+
+const buffer_t *get_payload_buffer(void)
+{
+	static const buffer_t buf = {
+			.data = payload_buffer,
+			.len = sizeof(payload_buffer)
+	};
+
+	return &buf;
+}
+
+/* https://docs.zephyrproject.org/latest/reference/networking/mqtt.html#c.mqtt_read_publish_payload */
+void handle_published_message(const struct mqtt_publish_message *msg)
+{
+	uint8_t topic[256];
+	size_t topic_size = msg->topic.topic.size;
+	size_t message_size = msg->payload.len;
+
+	if (topic_size >= sizeof(topic)) {
+		LOG_ERR("Topic is too long %u > %u",
+			topic_size,
+			sizeof(topic));
+		return;
+	}
+
+	// read topic
+	strncpy((char *)topic, (char *)msg->topic.topic.utf8, topic_size);
+	topic[topic_size] = '\0';
+
+	LOG_INF("Received %u B long message on topic %s", message_size, log_strdup(topic));
+
+	// get payload buffer
+	const buffer_t *buf = get_payload_buffer();
+	size_t received = 0U;
+	const bool discarded = message_size > buf->len;
+	if (discarded) {
+		LOG_WRN("Published messaged is too long for internal buffer %u > %u, discarding ...",
+			message_size,
+			buf->len);
+	}
+
+	while (received < message_size) {
+		ssize_t ret;
+
+		if (discarded == false) {
+			ret = mqtt_read_publish_payload(&client_ctx,
+							buf->data + received,
+							buf->len - received);
+		} else {
+			ret = mqtt_read_publish_payload(&client_ctx,
+							buf->data,
+							buf->len);
+		}
+
+		if (ret < 0) {
+			LOG_ERR("Failed to read payload: %d", ret);
+			break;
+		}
+
+		received += ret;
+	}
+
+	LOG_DBG("Receiving message completed");
+
+	if (discarded == false) {
+		LOG_HEXDUMP_INF(buf->data, received, "Received message");
+	}
+
+	// notify application with the received message
+}
+
+/*___________________________________________________________________________*/
+
+static const char *mqtt_evt_str[] = {
+	"MQTT_EVT_CONNACK",
+	"MQTT_EVT_DISCONNECT",
+	"MQTT_EVT_PUBLISH",
+	"MQTT_EVT_PUBACK",
+	"MQTT_EVT_PUBREC",
+	"MQTT_EVT_PUBREL",
+	"MQTT_EVT_PUBCOMP",
+	"MQTT_EVT_SUBACK",
+	"MQTT_EVT_UNSUBACK",
+	"MQTT_EVT_PINGRESP",
+};
+
+static const char *mqtt_evt_get_str(enum mqtt_evt_type evt_type)
+{
+	static const char *unknown = "mqtt_evt_type<UNKNOWN>";
+	const char *str = unknown;
+
+	if (evt_type < ARRAY_SIZE(mqtt_evt_str)) {
+		str = mqtt_evt_str[evt_type];
+	} else {
+		LOG_WRN("Unknown event type: %d", evt_type);
+	}
+	return str;
+}
 
 static void mqtt_event_cb(struct mqtt_client *client,
 			  const struct mqtt_evt *evt)
 {
-	LOG_DBG("Client: %x, event type: %hhx",
-		(uint32_t)client, (uint8_t)evt->type);
+	LOG_INF("Client: %x, event type: %hhx [ %s ]",
+		(uint32_t)client,
+		(uint8_t)evt->type,
+		log_strdup(mqtt_evt_get_str(evt->type)));
 
-	// switch(evt->type) {
+	switch (evt->type) {
+	case MQTT_EVT_CONNACK:
+	{
+		/* subsribe on few topics on connection */
+		subscribe_on_connect();
+		break;
+	}
 
-	// }
+	case MQTT_EVT_DISCONNECT:
+		break;
+
+	case MQTT_EVT_PUBLISH:
+	{
+		const struct mqtt_publish_message *msg =
+			&evt->param.publish.message;
+
+		handle_published_message(msg);
+		break;
+	}
+
+	case MQTT_EVT_PUBACK:
+		break;
+
+	case MQTT_EVT_PUBREC:
+		break;
+
+	case MQTT_EVT_PUBREL:
+		break;
+
+	case MQTT_EVT_PUBCOMP:
+		break;
+
+	case MQTT_EVT_SUBACK:
+	{
+		LOG_INF("Subscription acknowledged %d",
+			evt->param.suback.message_id);
+		break;
+	}
+
+	case MQTT_EVT_UNSUBACK:
+	{
+		LOG_INF("Unsubscription acknowledged %d",
+			evt->param.unsuback.message_id);
+		break;
+	}
+
+	case MQTT_EVT_PINGRESP:
+		break;
+	}
 }
 
-void aws_client_thread(void )
-{
-	int rc;
-	struct pollfd fds[1];
+/*___________________________________________________________________________*/
 
+
+static void aws_client_setup(void)
+{
 	// broker is properly defined at this point
 	mqtt_client_init(&client_ctx);
 
 	client_ctx.broker = &broker;
 	client_ctx.evt_cb = mqtt_event_cb;
 
-	client_ctx.client_id.utf8 = (uint8_t *) mqtt_client_name;
+	client_ctx.client_id.utf8 = (uint8_t *)mqtt_client_name;
 	client_ctx.client_id.size = sizeof(mqtt_client_name) - 1;
 	client_ctx.password = NULL;
 	client_ctx.user_name = NULL;
 
+	// client_ctx.keepalive = CONFIG_MQTT_KEEPALIVE;
+
 	client_ctx.protocol_version = MQTT_VERSION_3_1_1;
-	
+
 	client_ctx.rx_buf = rx_buffer;
 	client_ctx.rx_buf_size = sizeof(rx_buffer);
 	client_ctx.tx_buf = tx_buffer;
@@ -121,15 +326,70 @@ void aws_client_thread(void )
 	tls_config->sec_tag_list = sec_tls_tags;
 	tls_config->sec_tag_count = ARRAY_SIZE(sec_tls_tags);
 	tls_config->hostname = CONFIG_CLOUD_AWS_HOSTNAME;
+}
 
-	// connect
-	rc = mqtt_connect(&client_ctx);
-	if (rc != 0) {
-		LOG_ERR("Failed to connect to broker: %d", rc);
-		return;
+static int aws_client_try_connect(void)
+{
+	int ret;
+	uint32_t tries = 3U;
+
+	while (tries > 0) {
+		LOG_DBG("MQTT %u try connect", (uint32_t) &client_ctx);
+		ret = mqtt_connect(&client_ctx);
+		if (ret == 0) {
+			LOG_INF("MQTT %u connected !", (uint32_t) &client_ctx);
+			break;
+		} else {
+			LOG_ERR("Failed to connect: %d", ret);
+			k_sleep(K_SECONDS(5));
+			tries--;
+		}
 	}
 
-	LOG_INF("MQTT connected ! %d", 0);
+	return ret;
+}
+
+void aws_client_thread(void )
+{
+	int rc;
+	struct pollfd fds[1];
+
+	aws_client_setup();
+	
+	rc = aws_client_try_connect();
+	if (rc != 0) {
+		goto cleanup;
+	}
+
+	fds[0].fd = client_ctx.transport.tcp.sock;
+	fds[0].events = POLLIN | POLLHUP | POLLERR;
+	
+	for (;;) {
+		rc = poll(fds, 1, 5000);
+		if (rc >= 0) {
+			if ((fds[0].revents & POLLIN) != 0) {
+				rc = mqtt_input(&client_ctx);
+				if (rc != 0) {
+					LOG_ERR("Failed to read MQTT input: %d", rc);
+					break;
+				}
+			} else if ((fds[0].revents & (POLLHUP | POLLERR)) != 0) {
+				LOG_ERR("MQTT %x connection error/closed", (uint32_t)&client_ctx);
+				break;
+			} else {
+				LOG_DBG("MQTT %x poll timeout", (uint32_t)&client_ctx);
+			}
+
+			rc = mqtt_live(&client_ctx);
+			if ((rc != 0) && (rc != -EAGAIN)) {
+				LOG_ERR("Failed to live MQTT: %d", rc);
+				break;
+			}
+		} else {
+			LOG_ERR("poll failed: %d", rc);
+			break;
+		}
+	}
 
 	for (uint32_t i = 0; i < 10; i++) {
 		mqtt_input(&client_ctx);
@@ -137,6 +397,7 @@ void aws_client_thread(void )
 		k_sleep(K_SECONDS(1));
 	}
 
+cleanup:
 	rc = mqtt_disconnect(&client_ctx);
 	if (rc != 0) {
 		LOG_ERR("Failed to disconnect from broker: %d", rc);
@@ -145,11 +406,11 @@ void aws_client_thread(void )
 
 	LOG_INF("MQTT disconnected ! %d", 0);
 
-	// fds[0].fd = client_ctx.transport.tls.sock;
+	close(fds[0].fd);
+	fds[0].fd = -1;
 
-	for (;;) {
-
-	}
+	LOG_INF("MQTT cleanup %d", rc);
+	return;
 }
 
 /*___________________________________________________________________________*/

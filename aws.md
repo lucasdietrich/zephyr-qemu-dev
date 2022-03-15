@@ -6,6 +6,12 @@
 - [Zephyr RTOS : MQTT](https://docs.zephyrproject.org/latest/reference/networking/mqtt.html)
 - [AWS : MQTT test client](https://console.aws.amazon.com/iot/home?region=us-east-1#/test)
 
+Secondary :
+- [Designing MQTT Topics for AWS IoT Core](https://docs.aws.amazon.com/whitepapers/latest/designing-mqtt-topics-aws-iot-core/designing-mqtt-topics-aws-iot-core.html)
+    - Especially [MQTT design best practices](https://docs.aws.amazon.com/whitepapers/latest/designing-mqtt-topics-aws-iot-core/mqtt-design-best-practices.html)
+      - `Using the MQTT topics for commands` and `MQTT command payload syntax`, use a `session-id` to identify the command
+
+
 # Device information
 
 - Device : `zephyr-qemu-aws-device`
@@ -28,25 +34,34 @@
 
 ## Expected output
 
+![aws_mqtt_test_client_demo.png](./pics/aws_mqtt_test_client_demo.png)
+
 ```
-[13/14] Linking C executable zephyr/zephyr.elf
-Memory region         Used Size  Region Size  %age Used
-             RAM:      471072 B         3 MB     14.97%
-        IDT_LIST:          0 GB         2 KB      0.00%
-[13/14] To exit from QEMU enter: 'CTRL+a, x'[QEMU] CPU: qemu32,+nx,+pae
+-- west build: running target run
+[0/1] To exit from QEMU enter: 'CTRL+a, x'[QEMU] CPU: qemu32,+nx,+pae
 SeaBIOS (version zephyr-v1.0.0-0-g31d4e0e-dirty-20200714_234759-fv-az50-zephyr)
 Booting from ROM..*** Booting Zephyr OS build zephyr-v2.7.1  ***
 
 
 [00:00:00.110,000] <inf> net_config: IPv6 address: 2001:db8::1
 [00:00:00.110,000] <inf> net_config: IPv6 address: 2001:db8::1
-[00:00:00.110,000] <dbg> aws_client.resolve_hostname: Resolving: a31gokdeokxhl8-ats.iot.us-east-1.amazonaws.com
-<dbg> aws_client.resolve_hostname: Resolved: 52.1.218.247
-<dbg> aws_client.sntp_sync_time: Sending NTP request for current time: 0
-<dbg> aws_client.sntp_sync_time: Acquired time from NTP server: 1647293234
-<inf> aws_client: UTC time : 2022/03/14 21:27:14
-<inf> aws_client: MQTT connected ! 0
-<dbg> aws_client.mqtt_event_cb: Client: 14b840, event type: 0
-<dbg> aws_client.mqtt_event_cb: Client: 14b840, event type: 1
-<inf> aws_client: MQTT disconnected ! 0
+<inf> aws_client: UTC time : 2022/03/15 22:01:56
+<inf> aws_client: MQTT 1357888 connected !
+<inf> aws_client: Client: 14b840, event type: 0 [ MQTT_EVT_CONNACK ]
+<inf> aws_client: Subscribing to 2 topics
+<inf> aws_client: Client: 14b840, event type: 7 [ MQTT_EVT_SUBACK ]
+<inf> aws_client: Subscription acknowledged 1
+<inf> aws_client: Client: 14b840, event type: 2 [ MQTT_EVT_PUBLISH ]
+<inf> aws_client: Received 47 B long message on topic zephyr-qemu-aws-device/testTopic1
+<inf> aws_client: Received message
+                  7b 0a 20 20 22 6d 65 73  73 61 67 65 22 3a 20 22 |{.  "mes sage": "
+                  48 65 6c 6c 6f 20 66 72  6f 6d 20 41 57 53 20 49 |Hello fr om AWS I
+                  6f 54 20 63 6f 6e 73 6f  6c 65 20 21 22 0a 7d    |oT conso le !".} 
+<inf> aws_client: Client: 14b840, event type: 9 [ MQTT_EVT_PINGRESP ]
+<inf> aws_client: Client: 14b840, event type: 2 [ MQTT_EVT_PUBLISH ]
+<inf> aws_client: Received 47 B long message on topic zephyr-qemu-aws-device/testTopic2
+<inf> aws_client: Received message
+                  7b 0a 20 20 22 6d 65 73  73 61 67 65 22 3a 20 22 |{.  "mes sage": "
+                  48 65 6c 6c 6f 20 66 72  6f 6d 20 41 57 53 20 49 |Hello fr om AWS I
+                  6f 54 20 63 6f 6e 73 6f  6c 65 20 21 22 0a 7d    |oT conso le !".}
 ```

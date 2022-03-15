@@ -16,4 +16,16 @@ config CLOUD_AWS_DEVICE_NAME
 	help
 		Name of the device.
 
+config CLOUD_AWS_QOS
+	int "AWS MQTT QoS"
+	default 0
+	help
+		Quality of Service of the AWS MQTT broker.
+
+config CLOUD_AWS_PAYLOAD_BUFFER_SIZE
+	int "AWS MQTT payload buffer size"
+	default 4096
+	help
+		Size of the payload buffer.
+
 source "Kconfig.zephyr"
