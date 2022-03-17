@@ -6,7 +6,7 @@
         "env": {
             "venvPath": "../.venv",
             "westPath": "../.venv/bin/west",
-            "netToolsPath": "../net-tools",
+            "netToolsPath": "../tools/net-tools",
         }
     },
     "tasks": [
@@ -73,7 +73,8 @@
             "type": "shell",
             "command": "sudo iptables -t nat -A POSTROUTING -j MASQUERADE -s 192.0.2.1 && sudo sysctl -w net.ipv4.ip_forward=1",
             "presentation": {
-                "echo": false
+                "echo": false,
+                "focus": true
             },
             "problemMatcher": []
         },
