@@ -3,7 +3,6 @@
         "zephyrDirectory": "../zephyr",
         "modulesDirectory":  "../modules",
         "buildDirectory": "${workspaceFolder}/build"
-        // "compilerPath": "/usr/bin/arm-none-eabi-gcc"
     }, 
     "configurations": [
         {
@@ -57,6 +56,16 @@
                     "${zephyrDirectory}/include/posix"
                 ]
             },
+            "defines": [
+                "STM32F429xx",
+                "CORE_CM4",
+                "HSE_VALUE=8000000",
+                "KERNEL",
+                "STM32F429xx",
+                "USE_FULL_LL_DRIVER",
+                "USE_HAL_DRIVER",
+                "__ZEPHYR__=1"
+            ],
             // "intelliSenseMode": "gcc-x86",
             "cStandard": "c99",
             // "compilerPath": "${compilerPath}",

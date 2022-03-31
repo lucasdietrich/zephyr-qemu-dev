@@ -27,6 +27,8 @@
         "time.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "*.cer": "c"
+        "*.cer": "c",
+        "errno.h": "c",
+        "sntp.h": "c"
     }
 }
