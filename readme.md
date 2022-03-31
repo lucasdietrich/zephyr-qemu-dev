@@ -1,5 +1,7 @@
 # Zephyr RTOS and QEMU emulator
 
+See [**AWS specific readme**](./aws.md)
+
 ## Ressources :
 
 - [Zephyr CMake Package - Zephyr Build Configuration CMake package](https://docs.zephyrproject.org/latest/guides/zephyr_cmake_package.html#cmake-build-config-package)
@@ -9,7 +11,7 @@
 - [VS Code integration #21119](https://github.com/zephyrproject-rtos/zephyr/issues/21119)
 - [West (Zephyr’s meta-tool)](https://docs.zephyrproject.org/latest/guides/west/index.html)
 - [West Manifests](https://docs.zephyrproject.org/latest/guides/west/manifest.html)
-- [Moving to West¶](https://docs.zephyrproject.org/latest/guides/west/moving-to-west.html)
+- [Moving to West](https://docs.zephyrproject.org/latest/guides/west/moving-to-west.html)
 - [Workspaces](https://docs.zephyrproject.org/latest/guides/west/workspaces.html)
   - [T2: Star topology, application is the manifest repository](https://docs.zephyrproject.org/latest/guides/west/workspaces.html#west-t2)
 - [Zephyr RTOS Development in Linux](https://github.com/bus710/zephyr-rtos-development-in-linux)
@@ -18,7 +20,7 @@
 - [QEMU wiki](https://wiki.qemu.org/Main_Page)
 - [GDB: The GNU Project Debugger](https://www.sourceware.org/gdb/)
 - [VS Code - Debugging](https://code.visualstudio.com/docs/editor/debugging)
-
+- [NAT/masquerading on host to access Internet](https://docs.zephyrproject.org/latest/guides/networking/qemu_setup.html#id11)
 ## Import this project using west
 
 ```
@@ -44,19 +46,16 @@ And keep the consoles over sessions
 
 Run or debug the application normally
 
+NAT/masquerading on host to access Internet :
+
+```
+sudo iptables -t nat -A POSTROUTING -j MASQUERADE -s 192.0.2.1
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
 ## Run : Expected output
 
-```
-> Executing task: ${westPath} build -t run <
-
--- west build: running target run
-[0/1] To exit from QEMU enter: 'CTRL+a, x'[QEMU] CPU: qemu32,+nx,+pae
-SeaBIOS (version zephyr-v1.0.0-0-g31d4e0e-dirty-20200714_234759-fv-az50-zephyr)
-Booting from ROM..*** Booting Zephyr OS build zephyr-v2.7.1  ***
-(1) Hello world !
-(2) Hello world !
-(3) Hello world !
-```
+![zephyr_qemu_networking_debug.png](./pics/zephyr_qemu_networking_debug.png)
 
 ## Known issues
 
