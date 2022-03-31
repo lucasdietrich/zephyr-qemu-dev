@@ -40,7 +40,7 @@ static uint8_t payload_buffer[CONFIG_CLOUD_AWS_PAYLOAD_BUFFER_SIZE];
 
 static struct mqtt_client client_ctx;
 
-const char mqtt_client_name[] = "zephyr_qemu_aws_mqtt_client";
+const char mqtt_client_name[] = CONFIG_CLOUD_AWS_DEVICE_NAME;
 
 atomic_t mqtt_connected = ATOMIC_INIT(0);
 
@@ -93,8 +93,9 @@ exit:
 
 #define TOPIC1 (CONFIG_CLOUD_AWS_DEVICE_NAME "/testTopic1")
 #define TOPIC2 (CONFIG_CLOUD_AWS_DEVICE_NAME "/testTopic2")
+#define TOPIC3 (CONFIG_CLOUD_AWS_DEVICE_NAME "/testTopic3")
 
-int subscribe_on_connect(void)
+static int subscribe_on_connect(void)
 {
 	int ret;
 
@@ -135,7 +136,7 @@ int subscribe_on_connect(void)
 	return ret;
 }
 
-const buffer_t *get_payload_buffer(void)
+static const buffer_t *get_payload_buffer(void)
 {
 	static const buffer_t buf = {
 			.data = payload_buffer,
@@ -145,8 +146,33 @@ const buffer_t *get_payload_buffer(void)
 	return &buf;
 }
 
+static int publish_message(const char *topic, size_t topic_len,
+			   uint8_t *payload, size_t payload_len)
+{
+	int ret;
+	struct mqtt_publish_param msg;
+
+	msg.retain_flag = 1U;
+	msg.message.topic.topic.utf8 = topic;
+	msg.message.topic.topic.size = topic_len;
+	msg.message.topic.qos = CONFIG_CLOUD_AWS_QOS;
+	msg.message.payload.data = payload;
+	msg.message.payload.len = payload_len;
+
+	ret = mqtt_publish(&client_ctx, &msg);
+	if (ret != 0) {
+		LOG_ERR("Failed to publish message: %d", ret);
+	}
+
+	LOG_INF("Publish %u B long message on topic %s", 
+		payload_len, log_strdup(topic));
+	LOG_HEXDUMP_INF(payload, payload_len, "Publish message");
+
+	return ret;
+}
+
 /* https://docs.zephyrproject.org/latest/reference/networking/mqtt.html#c.mqtt_read_publish_payload */
-void handle_published_message(const struct mqtt_publish_message *msg)
+static void handle_published_message(const struct mqtt_publish_message *msg)
 {
 	uint8_t topic[256];
 	size_t topic_size = msg->topic.topic.size;
@@ -203,6 +229,7 @@ void handle_published_message(const struct mqtt_publish_message *msg)
 	}
 
 	// notify application with the received message
+	publish_message(TOPIC3, sizeof(TOPIC3) - 1, buf->data, received);
 }
 
 /*___________________________________________________________________________*/
@@ -363,9 +390,10 @@ void aws_client_thread(void )
 
 	fds[0].fd = client_ctx.transport.tcp.sock;
 	fds[0].events = POLLIN | POLLHUP | POLLERR;
-	
+
+	int timeout = mqtt_keepalive_time_left(&client_ctx);
 	for (;;) {
-		rc = poll(fds, 1, 5000);
+		rc = poll(fds, 1, timeout);
 		if (rc >= 0) {
 			if ((fds[0].revents & POLLIN) != 0) {
 				rc = mqtt_input(&client_ctx);
@@ -389,12 +417,6 @@ void aws_client_thread(void )
 			LOG_ERR("poll failed: %d", rc);
 			break;
 		}
-	}
-
-	for (uint32_t i = 0; i < 10; i++) {
-		mqtt_input(&client_ctx);
-		mqtt_live(&client_ctx);
-		k_sleep(K_SECONDS(1));
 	}
 
 cleanup:
