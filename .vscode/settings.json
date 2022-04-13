@@ -29,6 +29,7 @@
         "stdlib.h": "c",
         "*.cer": "c",
         "errno.h": "c",
-        "sntp.h": "c"
+        "sntp.h": "c",
+        "http_client.h": "c"
     }
 }

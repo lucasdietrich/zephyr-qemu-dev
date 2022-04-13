@@ -3,20 +3,20 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include <posix/time.h>
-
-#include <net/mqtt.h>
-
 #include <net/socket.h>
 #include <net/net_core.h>
 #include <net/net_if.h>
 #include <net/net_mgmt.h>
 #include <net/dns_resolve.h>
 
+#include <net/http_client.h>
+
 #include <logging/log.h>
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 /*___________________________________________________________________________*/
+
+
 
 int main(void)
 {
