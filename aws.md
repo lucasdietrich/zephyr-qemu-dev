@@ -5,7 +5,8 @@
 - [AWS : MQTT](https://docs.aws.amazon.com/fr_fr/iot/latest/developerguide/mqtt.html)
 - [Zephyr RTOS : MQTT](https://docs.zephyrproject.org/latest/reference/networking/mqtt.html)
 - [AWS : MQTT test client](https://console.aws.amazon.com/iot/home?region=us-east-1#/test)
-
+- [AWS devices list](https://us-east-1.console.aws.amazon.com/iot/home?region=us-east-1#/thinghub)
+  - [`zephyr-qemu-aws-device`](https://us-east-1.console.aws.amazon.com/iot/home?region=us-east-1#/thing/zephyr-qemu-aws-device  )
 Secondary :
 - [Designing MQTT Topics for AWS IoT Core](https://docs.aws.amazon.com/whitepapers/latest/designing-mqtt-topics-aws-iot-core/designing-mqtt-topics-aws-iot-core.html)
     - Especially [MQTT design best practices](https://docs.aws.amazon.com/whitepapers/latest/designing-mqtt-topics-aws-iot-core/mqtt-design-best-practices.html)
@@ -33,6 +34,12 @@ Secondary :
 - IPv4 addr
 
 ## Expected output
+
+Let's suppose device name is `zephyr-qemu-aws-device`
+
+- Configure device `CONFIG_CLOUD_AWS_DEVICE_NAME="zephyr-qemu-aws-device"` in `prj.conf`
+- Subscribe to topics : `zephyr-qemu-aws-device/testTopic1` and `zephyr-qemu-aws-device/testTopic2`
+- Send MQTT messages to topic `zephyr-qemu-aws-device/testTopic2`
 
 ![aws_mqtt_test_client_demo.png](./pics/aws_mqtt_test_client_demo.png)
 
