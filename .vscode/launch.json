@@ -13,7 +13,8 @@
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
-            // Nothing happen if preLaunchTask is executed automatically
+
+            // Find a way to not wait for ninja debugser to finish
             // "preLaunchTask": "Ninja debugserver",
             "environment": [],
             "externalConsole": true,
@@ -27,6 +28,27 @@
                     "ignoreFailures": true
                 }
             ]
-        }
+        },
+        {
+            "name": "(gdb) QEMU ARM",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/zephyr/zephyr.elf",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/arm-none-eabi-gdb",
+            "miDebuggerServerAddress": "localhost:1234",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }

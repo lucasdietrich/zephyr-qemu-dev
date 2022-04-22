@@ -10,7 +10,7 @@
             "includePath": [
                 "src",
                 "${buildDirectory}/zephyr/include/generated",
-                "${zephyrDirectory}/include",
+                "${zephyrDirectory}/include/**",
                 "${zephyrDirectory}/kernel/include/**",
                 "${zephyrDirectory}/lib/libc/minimal/include/**",
                 "${zephyrDirectory}/arch/**",
