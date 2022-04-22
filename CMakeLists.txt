@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.20.0)
 
-set(BOARD qemu_x86)
-
 find_package(Zephyr)
 project(zephyr_qemi_networking_demo)
 

@@ -11,10 +11,30 @@
     },
     "tasks": [
         {
-            "label": "Build",
+            "label": "Build x86",
             "detail": "Build for QEMU",
             "type": "shell",
-            "command": "${westPath} build",
+            "command": "${westPath} build -b qemu_x86",
+            "args": [
+
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "options": {
+                "statusbar": {
+                    "hide": false
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build ARM",
+            "detail": "Build for QEMU",
+            "type": "shell",
+            "command": "${westPath} build -b qemu_cortex_m3",
             "args": [
 
             ],
