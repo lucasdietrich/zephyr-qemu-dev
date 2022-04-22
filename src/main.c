@@ -38,8 +38,12 @@ void thread(void *_a, void *_b, void *_c)
  *    >>> ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0
  *    Current thread: 0x10f840 (unknown)
  *    Halting system
+ * 
+ * Second solution is to configure system workqueue () with a lower priority than "thread"
+ * 	Example : CONFIG_SYSTEM_WORKQUEUE_PRIORITY=12
+ * 	          and thread priority K_PRIO_PREEMPT(8)
  */
-K_THREAD_DEFINE(tid, 0x1000, thread, NULL, NULL, NULL, K_PRIO_COOP(8), 0, -1);
+K_THREAD_DEFINE(tid, 0x1000, thread, NULL, NULL, NULL, K_PRIO_PREEMPT(8), 0, -1);
 
 K_SEM_DEFINE(sem, 1, 1);
 static struct k_work_poll work;
