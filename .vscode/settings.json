@@ -29,6 +29,12 @@
         "stdlib.h": "c",
         "*.cer": "c",
         "errno.h": "c",
-        "sntp.h": "c"
+        "sntp.h": "c",
+        "log_instance.h": "c",
+        "log_core.h": "c",
+        "log_msg2.h": "c",
+        "log_msg.h": "c",
+        "cbprintf.h": "c",
+        "mpsc_packet.h": "c"
     }
 }
