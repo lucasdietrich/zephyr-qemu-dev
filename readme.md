@@ -32,6 +32,8 @@ west init -m https://github.com/lucasdietrich/zephyr-qemu-dev --mr main my-works
 
 Set `revision` to `main`, `2.7.2` or `3.0.0` for example
 
+Then run `west update`
+
 ## Build
 
 Open tasks panel with `Ctrl + Maj + B`
