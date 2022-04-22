@@ -52,7 +52,6 @@ static struct k_poll_event event;
 
 static void work_handler(struct k_work *p_work)
 {
-	// int ret;
 	uint32_t val;
 
 	/* process all available messages */
@@ -63,10 +62,8 @@ static void work_handler(struct k_work *p_work)
 	/* re-schedule work */
 	// k_poll_event_init(&event, K_POLL_TYPE_MSGQ_DATA_AVAILABLE,
 	// 		  K_POLL_MODE_NOTIFY_ONLY, &msgq);
-	// ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
-	// LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
-
-	k_sem_give(&sem);
+	int ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
+	LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
 }
 
 void main(void)
@@ -79,12 +76,6 @@ void main(void)
 
 	k_thread_start(tid);
 
-	for (;;) {
-		k_sem_take(&sem, K_FOREVER);
-
-		ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
-		LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
-
-		k_sleep(K_MSEC(1000));
-	}
+	ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
+	LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
 }
