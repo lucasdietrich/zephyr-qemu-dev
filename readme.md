@@ -21,21 +21,31 @@ See [**AWS specific readme**](./aws.md)
 - [GDB: The GNU Project Debugger](https://www.sourceware.org/gdb/)
 - [VS Code - Debugging](https://code.visualstudio.com/docs/editor/debugging)
 - [NAT/masquerading on host to access Internet](https://docs.zephyrproject.org/latest/guides/networking/qemu_setup.html#id11)
+
 ## Import this project using west
 
 ```
 west init -m https://github.com/lucasdietrich/zephyr-qemu-dev --mr main my-workspace
 ```
 
+## Update Zephyr RTOS version in `west.yml`
+
+Set `revision` to `main`, `2.7.2` or `3.0.0` for example
+
 ## Build
 
 Open tasks panel with `Ctrl + Maj + B`
+- For QEMU x86
+- For QEMU ARM (Cortex M3)
+
 
 ## Debug
 
-Launch `Ninja debugserver` task and press `F5`
+- Launch `Ninja debugserver` task
+- Select debug configuration amond `(gdb) QEMU x86` or `(gdb) QEMU ARM`
+- Press `F5`
 
-## Networking
+## Networking (if needed)
 
 In order to run/debug the networking application
 
