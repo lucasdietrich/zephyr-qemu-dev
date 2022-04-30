@@ -1,6 +1,17 @@
 # Zephyr RTOS and QEMU emulator
 
-See [**AWS specific readme**](./aws.md)
+## CMake note:
+
+Consider warning :
+
+```
+CMake Warning at /home/lucas/zephyrproject/zephyr/cmake/extensions.cmake:533 (message):
+  zephyr_library() or zephyr_library_named() called in Zephyr CMake
+  application mode.  `simplelib` will not be treated as a Zephyr library.To
+  create a Zephyr library in Zephyr CMake kernel mode consider creating a
+  Zephyr module.  See more here:
+  https://docs.zephyrproject.org/latest/guides/modules.html
+```
 
 ## Ressources :
 
