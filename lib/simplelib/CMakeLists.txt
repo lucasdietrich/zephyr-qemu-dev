@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.13.1)
 
 project(simplelib)
 
-file(GLOB_RECURSE LIB_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-zephyr_library_named(simplelib)
-zephyr_library_include_directories(include)
-zephyr_library_sources(${LIB_SRC_FILES})
+set(LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)
+
+add_library(simplelib STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/slib.c
+)

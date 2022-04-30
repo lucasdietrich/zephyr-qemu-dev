@@ -32,6 +32,7 @@
                 "${zephyrDirectory}/include/posix",
 
                 "${workspaceFolder}/lib/simplelib/include/**",
+                "${workspaceFolder}/lib/myzephyrlib/include/**"
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,

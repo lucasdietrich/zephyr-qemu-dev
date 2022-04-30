@@ -1,7 +1,9 @@
 #include <zephyr.h>
 
 #include "sub/hello.h"
+
 #include <simplelib/slib.h>
+#include <myzephyrlib/zlib.h>
 
 int main(void)
 {
@@ -11,8 +13,8 @@ int main(void)
 	uint32_t b;
 	for (;;) {
 		hello();
-		slib_put(i);
-		slib_get(&b);
+		myzephyrlib_put(i);
+		myzephyrlib_get(&b);
 		printk("%u\n", b);
 		k_sleep(K_SECONDS(1));
 
