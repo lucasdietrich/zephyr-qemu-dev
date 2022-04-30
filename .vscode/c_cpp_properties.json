@@ -29,7 +29,9 @@
                 "${modulesDirectory}/hal/stm32/stm32cube/common_ll/include",
                 "${modulesDirectory}/crypto/mbedtls/mbedtls/include",
                 "${zephyrDirectory}/modules/mbedtls/configs",
-                "${zephyrDirectory}/include/posix"
+                "${zephyrDirectory}/include/posix",
+
+                "${workspaceFolder}/lib/simplelib/include/**",
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,

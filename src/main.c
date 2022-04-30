@@ -1,7 +1,16 @@
 #include <zephyr.h>
 
+#include "sub/hello.h"
+#include <simplelib/slib.h>
+
 int main(void)
 {
-    printk("Hello, world!\n");
-    return 0;
+	slib_init();
+
+	for (;;) {
+		hello();
+		k_sleep(K_SECONDS(1));
+	}
+
+	return 0;
 }

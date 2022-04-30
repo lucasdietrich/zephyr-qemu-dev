@@ -31,6 +31,7 @@
         "errno.h": "c",
         "sntp.h": "c",
         "net_if.h": "c",
-        "certs.h": "c"
+        "certs.h": "c",
+        "utils.h": "c"
     }
 }
