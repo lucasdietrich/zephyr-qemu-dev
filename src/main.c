@@ -1,71 +1,104 @@
 #include <kernel.h>
 
-#include <logging/log.h>
-LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
+#define MSG_PROVIDER_THREAD_STACK_SIZE 0x400U
+#define MSG_CONSUMER_WORKQ_STACK_SIZE 0x400U
 
-K_MSGQ_DEFINE(msgq, sizeof(uint32_t), 4, 4);
+#define MSG_PROVIDER_THREAD_PRIO K_PRIO_PREEMPT(8)
+#define MSG_CONSUMER_WORKQ_PRIO K_PRIO_PREEMPT(7)
+#define MSG_SIZE 16U
 
-// publisher
-static void thread(void *_a, void *_b, void *_c)
+static K_THREAD_STACK_DEFINE(provider_thread_stack, MSG_PROVIDER_THREAD_STACK_SIZE);
+static K_THREAD_STACK_DEFINE(consumer_workq_stack, MSG_CONSUMER_WORKQ_STACK_SIZE);
+
+typedef char msg_t[MSG_SIZE];
+
+struct triggered_from_msgq_test_item {
+	k_tid_t tid;
+	struct k_thread msg_provider_thread;
+	struct k_work_q msg_consumer_workq;
+	struct k_work_poll work;
+	char msgq_buf[1][MSG_SIZE];
+	struct k_msgq msgq;
+	struct k_poll_event event;
+};
+
+static struct triggered_from_msgq_test_item triggered_from_msgq_test;
+
+static void msg_provider_thread(void *p1, void *p2, void *p3)
 {
-	uint32_t val = 0;
-	for (;;) {
-		val++;
-		int ret = k_msgq_put(&msgq, &val, K_NO_WAIT);
-		if (ret < 0) {
-			LOG_ERR("k_msgq_put failed: %d", ret);
-		}
-		k_sleep(K_MSEC(1000));
-	}
+	ARG_UNUSED(p1);
+	ARG_UNUSED(p2);
+	ARG_UNUSED(p3);
+
+	msg_t msg;
+
+	k_msgq_put(&triggered_from_msgq_test.msgq, &msg, K_NO_WAIT);
 }
 
-/** If Priority is K_PRIO_PREEMPT, with CONFIG_ASSERT=y, "Recursive spinlock" assert fails
- * 
- * Exception: 
- *    ASSERTION FAIL [z_spin_lock_valid(l)] @ WEST_TOPDIR/zephyr/include/spinlock.h:129
- *            Recursive spinlock 0x11300c
- *    k_work_poll_submit(0x10e000, 0x10f8d0, 1U, K_FOREVER) = 0
- * 
- *    EAX: 0x0010b6ef, EBX: 0x0011300c, ECX: 0x001129bc, EDX: 0x0011300c
- *    ESI: 0x00109150, EDI: 0x00112ffc, EBP: 0x00112a08, ESP: 0x001129e0
- *    EFLAGS: 0x00000006 CS: 0x0008 CR3: 0x00119000
- *    call trace:
- *    EIP: 0x00101eee
- *         0x00100325 (0x112ffc)
- *         0x00109ac0 (0x10e000)
- *         0x00100c48 (0x10f840)
- *    >>> ZEPHYR FATAL ERROR 4: Kernel panic on CPU 0
- *    Current thread: 0x10f840 (unknown)
- *    Halting system
- * 
- * Second solution is to configure system workqueue () with a lower priority than "thread"
- * 	Example : CONFIG_SYSTEM_WORKQUEUE_PRIORITY=12
- * 	          and thread priority K_PRIO_PREEMPT(8)
+static void triggered_from_msgq_work_handler(struct k_work *work)
+{
+	msg_t msg;
+
+	// zassert_true(k_msgq_get(&triggered_from_msgq_test.msgq, &msg, K_NO_WAIT) == 0, NULL);
+
+	k_msgq_get(&triggered_from_msgq_test.msgq, &msg, K_NO_WAIT);
+}
+
+static void test_triggered_from_msgq_init(void)
+{
+	struct triggered_from_msgq_test_item *const ctx = &triggered_from_msgq_test;
+
+	ctx->tid = k_thread_create(&ctx->msg_provider_thread,
+				   provider_thread_stack,
+				   MSG_PROVIDER_THREAD_STACK_SIZE,
+				   msg_provider_thread,
+				   NULL, NULL, NULL,
+				   MSG_PROVIDER_THREAD_PRIO, 0, K_FOREVER);
+	k_work_queue_init(&ctx->msg_consumer_workq);
+	k_msgq_init(&ctx->msgq,
+		    (char *)ctx->msgq_buf,
+		    MSG_SIZE, 1U);
+	k_work_poll_init(&ctx->work, triggered_from_msgq_work_handler);
+	k_poll_event_init(&ctx->event, K_POLL_TYPE_MSGQ_DATA_AVAILABLE,
+			  K_POLL_MODE_NOTIFY_ONLY, &ctx->msgq);
+
+	k_work_queue_start(&ctx->msg_consumer_workq, consumer_workq_stack,
+			   MSG_CONSUMER_WORKQ_STACK_SIZE, MSG_CONSUMER_WORKQ_PRIO,
+			   NULL);
+	k_work_poll_submit_to_queue(&ctx->msg_consumer_workq, &ctx->work,
+				    &ctx->event, 1U, K_FOREVER);
+}
+
+static void test_triggered_from_msgq_start(void)
+{
+	k_thread_start(triggered_from_msgq_test.tid);
+}
+
+
+/**
+ * @brief Test triggered work item, triggered by a msgq message.
+ *
+ * @ingroup kernel_workqueue_tests
+ *
+ * @see k_work_poll_init(), k_work_poll_submit()
+ *
  */
-K_THREAD_DEFINE(tid, 0x1000, thread, NULL, NULL, NULL, K_PRIO_PREEMPT(8), 0, 0);
-
-static struct k_work_poll work;
-static struct k_poll_event event = K_POLL_EVENT_INITIALIZER(K_POLL_TYPE_MSGQ_DATA_AVAILABLE,
-							    K_POLL_MODE_NOTIFY_ONLY,
-							    &msgq);
-
-static void work_handler(struct k_work *p_work)
+static void test_triggered_from_msgq(void)
 {
-	uint32_t val;
+	// TC_PRINT("Starting triggered from msgq test\n");
 
-	/* process all available messages */
-	while (k_msgq_get(&msgq, &val, K_NO_WAIT) == 0U) {
-		LOG_DBG("received val: %u", val);
-	}
+	// TC_PRINT(" - Initializing kernel objects\n");
+	test_triggered_from_msgq_init();
 
-	int ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
-	LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
+	// TC_PRINT(" - Starting the thread putting the message in the msgq\n");
+	test_triggered_from_msgq_start();
+
+	// reset_results();
 }
 
-void main(void)
+int main(void)
 {
-	k_work_poll_init(&work, work_handler);
+	test_triggered_from_msgq();
 
-	int ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
-	LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
+	return 0;
 }

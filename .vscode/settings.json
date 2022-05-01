@@ -35,6 +35,7 @@
         "log_msg2.h": "c",
         "log_msg.h": "c",
         "cbprintf.h": "c",
-        "mpsc_packet.h": "c"
+        "mpsc_packet.h": "c",
+        "assert.h": "c"
     }
 }
