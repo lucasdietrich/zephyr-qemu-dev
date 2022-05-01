@@ -66,8 +66,6 @@ void main(void)
 {
 	k_work_poll_init(&work, work_handler);
 
-	// k_sleep(K_SECONDS(3));
-
 	int ret = k_work_poll_submit(&work, &event, 1U, K_FOREVER);
 	LOG_DBG("k_work_poll_submit(%p, %p, 1U, K_FOREVER) = %d", &work, &event, ret);
 }
