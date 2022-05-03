@@ -12,17 +12,17 @@ static K_THREAD_STACK_DEFINE(consumer_workq_stack, MSG_CONSUMER_WORKQ_STACK_SIZE
 
 typedef char msg_t[MSG_SIZE];
 
-struct triggered_from_msgq_test_item {
+struct triggered_from_fifo_test_item {
 	k_tid_t tid;
 	struct k_thread msg_provider_thread;
 	struct k_work_q msg_consumer_workq;
 	struct k_work_poll work;
-	char msgq_buf[1][MSG_SIZE];
-	struct k_msgq msgq;
+	struct k_fifo fifo;
 	struct k_poll_event event;
+	uint32_t fifo_item;
 };
 
-static struct triggered_from_msgq_test_item triggered_from_msgq_test;
+static struct triggered_from_fifo_test_item triggered_from_fifo_test;
 
 static void msg_provider_thread(void *p1, void *p2, void *p3)
 {
@@ -30,23 +30,19 @@ static void msg_provider_thread(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p2);
 	ARG_UNUSED(p3);
 
-	msg_t msg;
-
-	k_msgq_put(&triggered_from_msgq_test.msgq, &msg, K_NO_WAIT);
+	k_fifo_put(&triggered_from_fifo_test.fifo,
+		   &triggered_from_fifo_test.fifo_item);
 }
 
-static void triggered_from_msgq_work_handler(struct k_work *work)
+static void triggered_from_fifo_work_handler(struct k_work *work)
 {
-	msg_t msg;
-
-	// zassert_true(k_msgq_get(&triggered_from_msgq_test.msgq, &msg, K_NO_WAIT) == 0, NULL);
-
-	k_msgq_get(&triggered_from_msgq_test.msgq, &msg, K_NO_WAIT);
+	uint32_t *obj;
+	obj = k_fifo_get(&triggered_from_fifo_test.fifo, K_NO_WAIT);
 }
 
-static void test_triggered_from_msgq_init(void)
+static void test_triggered_from_fifo_init(void)
 {
-	struct triggered_from_msgq_test_item *const ctx = &triggered_from_msgq_test;
+	struct triggered_from_fifo_test_item *const ctx = &triggered_from_fifo_test;
 
 	ctx->tid = k_thread_create(&ctx->msg_provider_thread,
 				   provider_thread_stack,
@@ -55,12 +51,10 @@ static void test_triggered_from_msgq_init(void)
 				   NULL, NULL, NULL,
 				   MSG_PROVIDER_THREAD_PRIO, 0, K_FOREVER);
 	k_work_queue_init(&ctx->msg_consumer_workq);
-	k_msgq_init(&ctx->msgq,
-		    (char *)ctx->msgq_buf,
-		    MSG_SIZE, 1U);
-	k_work_poll_init(&ctx->work, triggered_from_msgq_work_handler);
-	k_poll_event_init(&ctx->event, K_POLL_TYPE_MSGQ_DATA_AVAILABLE,
-			  K_POLL_MODE_NOTIFY_ONLY, &ctx->msgq);
+	k_fifo_init(&ctx->fifo);
+	k_work_poll_init(&ctx->work, triggered_from_fifo_work_handler);
+	k_poll_event_init(&ctx->event, K_POLL_TYPE_FIFO_DATA_AVAILABLE,
+			  K_POLL_MODE_NOTIFY_ONLY, &ctx->fifo);
 
 	k_work_queue_start(&ctx->msg_consumer_workq, consumer_workq_stack,
 			   MSG_CONSUMER_WORKQ_STACK_SIZE, MSG_CONSUMER_WORKQ_PRIO,
@@ -69,36 +63,36 @@ static void test_triggered_from_msgq_init(void)
 				    &ctx->event, 1U, K_FOREVER);
 }
 
-static void test_triggered_from_msgq_start(void)
+static void test_triggered_from_fifo_start(void)
 {
-	k_thread_start(triggered_from_msgq_test.tid);
+	k_thread_start(triggered_from_fifo_test.tid);
 }
 
 
 /**
- * @brief Test triggered work item, triggered by a msgq message.
+ * @brief Test triggered work item, triggered by a fifo message.
  *
  * @ingroup kernel_workqueue_tests
  *
  * @see k_work_poll_init(), k_work_poll_submit()
  *
  */
-static void test_triggered_from_msgq(void)
+static void test_triggered_from_fifo(void)
 {
-	// TC_PRINT("Starting triggered from msgq test\n");
+	// TC_PRINT("Starting triggered from fifo test\n");
 
 	// TC_PRINT(" - Initializing kernel objects\n");
-	test_triggered_from_msgq_init();
+	test_triggered_from_fifo_init();
 
-	// TC_PRINT(" - Starting the thread putting the message in the msgq\n");
-	test_triggered_from_msgq_start();
+	// TC_PRINT(" - Starting the thread putting the message in the fifo\n");
+	test_triggered_from_fifo_start();
 
 	// reset_results();
 }
 
 int main(void)
 {
-	test_triggered_from_msgq();
+	test_triggered_from_fifo();
 
 	return 0;
 }
