@@ -1,21 +1,21 @@
 #include <kernel.h>
 
-#define MSG_PROVIDER_THREAD_STACK_SIZE 0x400U
-#define MSG_CONSUMER_WORKQ_STACK_SIZE 0x400U
+#define OBJ_PROVIDER_THREAD_STACK_SIZE 0x400U
+#define OBJ_CONSUMER_WORKQ_STACK_SIZE 0x400U
 
-#define MSG_PROVIDER_THREAD_PRIO K_PRIO_PREEMPT(8)
-#define MSG_CONSUMER_WORKQ_PRIO K_PRIO_PREEMPT(7)
-#define MSG_SIZE 16U
+#define OBJ_PROVIDER_THREAD_PRIO K_PRIO_PREEMPT(8)
+#define OBJ_CONSUMER_WORKQ_PRIO K_PRIO_PREEMPT(7)
+#define OBJ_SIZE 16U
 
-static K_THREAD_STACK_DEFINE(provider_thread_stack, MSG_PROVIDER_THREAD_STACK_SIZE);
-static K_THREAD_STACK_DEFINE(consumer_workq_stack, MSG_CONSUMER_WORKQ_STACK_SIZE);
+static K_THREAD_STACK_DEFINE(provider_thread_stack, OBJ_PROVIDER_THREAD_STACK_SIZE);
+static K_THREAD_STACK_DEFINE(consumer_workq_stack, OBJ_CONSUMER_WORKQ_STACK_SIZE);
 
-typedef char msg_t[MSG_SIZE];
+typedef char obj_t[OBJ_SIZE];
 
 struct triggered_from_fifo_test_item {
 	k_tid_t tid;
-	struct k_thread msg_provider_thread;
-	struct k_work_q msg_consumer_workq;
+	struct k_thread obj_provider_thread;
+	struct k_work_q obj_consumer_workq;
 	struct k_work_poll work;
 	struct k_fifo fifo;
 	struct k_poll_event event;
@@ -24,7 +24,7 @@ struct triggered_from_fifo_test_item {
 
 static struct triggered_from_fifo_test_item triggered_from_fifo_test;
 
-static void msg_provider_thread(void *p1, void *p2, void *p3)
+static void obj_provider_thread(void *p1, void *p2, void *p3)
 {
 	ARG_UNUSED(p1);
 	ARG_UNUSED(p2);
@@ -44,22 +44,22 @@ static void test_triggered_from_fifo_init(void)
 {
 	struct triggered_from_fifo_test_item *const ctx = &triggered_from_fifo_test;
 
-	ctx->tid = k_thread_create(&ctx->msg_provider_thread,
+	ctx->tid = k_thread_create(&ctx->obj_provider_thread,
 				   provider_thread_stack,
-				   MSG_PROVIDER_THREAD_STACK_SIZE,
-				   msg_provider_thread,
+				   OBJ_PROVIDER_THREAD_STACK_SIZE,
+				   obj_provider_thread,
 				   NULL, NULL, NULL,
-				   MSG_PROVIDER_THREAD_PRIO, 0, K_FOREVER);
-	k_work_queue_init(&ctx->msg_consumer_workq);
+				   OBJ_PROVIDER_THREAD_PRIO, 0, K_FOREVER);
+	k_work_queue_init(&ctx->obj_consumer_workq);
 	k_fifo_init(&ctx->fifo);
 	k_work_poll_init(&ctx->work, triggered_from_fifo_work_handler);
 	k_poll_event_init(&ctx->event, K_POLL_TYPE_FIFO_DATA_AVAILABLE,
 			  K_POLL_MODE_NOTIFY_ONLY, &ctx->fifo);
 
-	k_work_queue_start(&ctx->msg_consumer_workq, consumer_workq_stack,
-			   MSG_CONSUMER_WORKQ_STACK_SIZE, MSG_CONSUMER_WORKQ_PRIO,
+	k_work_queue_start(&ctx->obj_consumer_workq, consumer_workq_stack,
+			   OBJ_CONSUMER_WORKQ_STACK_SIZE, OBJ_CONSUMER_WORKQ_PRIO,
 			   NULL);
-	k_work_poll_submit_to_queue(&ctx->msg_consumer_workq, &ctx->work,
+	k_work_poll_submit_to_queue(&ctx->obj_consumer_workq, &ctx->work,
 				    &ctx->event, 1U, K_FOREVER);
 }
 
