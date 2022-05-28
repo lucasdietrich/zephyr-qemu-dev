@@ -1,7 +1,10 @@
 #include <zephyr.h>
 
+#include <caniot/caniot.h>
+
 int main(void)
 {
-    printk("Hello, world!\n");
+    caniot_test();
+    
     return 0;
 }
