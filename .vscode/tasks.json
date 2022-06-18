@@ -6,7 +6,7 @@
         "env": {
             "venvPath": "../.venv",
             "westPath": "../.venv/bin/west",
-            "netToolsPath": "../tools/net-tools",
+            "netToolsPath": "../net-tools",
         }
     },
     "tasks": [
