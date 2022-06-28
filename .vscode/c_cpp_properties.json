@@ -1,80 +1,16 @@
 {
-    "env" : {
-        "zephyrDirectory": "../zephyr",
-        "modulesDirectory":  "../modules",
-        "buildDirectory": "${workspaceFolder}/build"
-    }, 
     "configurations": [
         {
-            "name": "Demo",
-            "includePath": [
-                "src",
-                "${buildDirectory}/zephyr/include/generated",
-                "${zephyrDirectory}/include/**",
-                "${zephyrDirectory}/kernel/include/**",
-                "${zephyrDirectory}/lib/libc/minimal/include/**",
-                "${zephyrDirectory}/arch/**",
-                "${zephyrDirectory}/soc/arm/st_stm32/stm32f4",
-                "${zephyrDirectory}/drivers",
-                "${zephyrDirectory}/soc/arm/st_stm32/common",
-                "${zephyrDirectory}/subsys/net/l2",
-                "${zephyrDirectory}/subsys/net/lib/sockets",
-                "${zephyrDirectory}/subsys/net/lib/tls_credentials",
-                "${zephyrDirectory}/subsys/net/lib/dns",
-                "${zephyrDirectory}/subsys/net/ip",
-                "${modulesDirectory}/hal/cmsis/CMSIS/Core/Include",
-                "${modulesDirectory}/hal/stm32/stm32cube/stm32f4xx/soc",
-                "${modulesDirectory}/hal/stm32/stm32cube/stm32f4xx/drivers/include",
-                "${modulesDirectory}/hal/stm32/stm32cube/stm32f4xx/drivers/include/Legacy",
-                "${modulesDirectory}/hal/stm32/stm32cube/common_ll/include",
-                "${modulesDirectory}/crypto/mbedtls/mbedtls/include",
-                "${zephyrDirectory}/modules/mbedtls/configs",
-                "${zephyrDirectory}/include/posix"
-            ],
+            "name": "ARM",
+            "compileCommands": "${workspaceRoot}/build/compile_commands.json",
+            "intelliSenseMode": "clang-x64",
             "browse": {
-                "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "src",
-                    "${zephyrDirectory}/include",
-                    "${zephyrDirectory}/kernel/include",
-                    "${buildDirectory}/zephyr/include/generated",
-                    "${zephyrDirectory}/soc/arm/st_stm32/stm32f4",
-                    "${zephyrDirectory}/drivers",
-                    "${zephyrDirectory}/soc/arm/st_stm32/common",
-                    "${zephyrDirectory}/subsys/net/l2",
-                    "${zephyrDirectory}/subsys/net/lib/sockets",
-                    "${zephyrDirectory}/subsys/net/lib/tls_credentials",
-                    "${zephyrDirectory}/subsys/net/lib/dns",
-                    "${zephyrDirectory}/subsys/net/ip",
-                    "${modulesDirectory}/hal/cmsis/CMSIS/Core/Include",
-                    "${modulesDirectory}/hal/stm32/stm32cube/stm32f4xx/soc",
-                    "${modulesDirectory}/hal/stm32/stm32cube/stm32f4xx/drivers/include",
-                    "${modulesDirectory}/hal/stm32/stm32cube/stm32f4xx/drivers/include/Legacy",
-                    "${modulesDirectory}/hal/stm32/stm32cube/common_ll/include",
-                    "${modulesDirectory}/crypto/mbedtls/mbedtls/include",
-                    "${zephyrDirectory}/modules/mbedtls/configs",
-                    "${zephyrDirectory}/include/posix"
+                    "${workspaceFolder}"
                 ]
             },
-            "defines": [
-                "STM32F429xx",
-                "CORE_CM4",
-                "HSE_VALUE=8000000",
-                "KERNEL",
-                "STM32F429xx",
-                "USE_FULL_LL_DRIVER",
-                "USE_HAL_DRIVER",
-                "__ZEPHYR__=1"
-            ],
-            // "intelliSenseMode": "gcc-x86",
             "cStandard": "c99",
-            // "compilerPath": "${compilerPath}",
-            // "cppStandard": "c++11",
-            // "cStandard": "c11"
-            "forcedInclude": [
-                "${buildDirectory}/zephyr/include/generated/autoconf.h",
-                "${zephyrDirectory}/include/toolchain/zephyr_stdint.h"
-            ]
+            "cppStandard": "c++11"
         }
     ],
     "version": 4

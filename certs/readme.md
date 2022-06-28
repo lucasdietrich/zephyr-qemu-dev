@@ -1,5 +1,12 @@
-This directory contains all certificates in Cheaders.
+# Certificates
 
-Add `XXX-certificate.pem.crt` and `XXX-private.pem` files into this directory (`./certs`)
-run `./script/gencertsh.py` before bulding the project
+1. Drop the certificates downloaded from AWS here, in PEM format:
+- `XXX-certificate.pem.crt`
+- `XXX-private.pem`
 
+2. Run `python3 ./script/gencertsh.py` from project root directory.
+
+3. Following files should have been created in `src/certs` directory:
+- CA: `ca_cert.cer`
+- Public certificate: `public_cert.cer`
+- Private key: `private_key.cer`

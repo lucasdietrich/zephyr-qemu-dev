@@ -2,13 +2,12 @@
     // See http://go.microsoft.com/fwlink/?LinkId=827846
     // for the documentation about the extensions.json format
     "recommendations": [
+        "actboy168.tasks",
         "editorconfig.editorconfig",
         "humao.rest-client",
         "ms-vscode.cpptools",
-        "actboy168.tasks"
-        // "marus25.cortex-debug"
     ],
     "unwantedRecommendations": [
-        "ms-vscode.cpptools-extension-pack"
+        "ms-vscode.cmake-tools"
     ]
 }
