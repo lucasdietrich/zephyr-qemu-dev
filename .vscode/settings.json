@@ -31,6 +31,12 @@
         "errno.h": "c",
         "sntp.h": "c",
         "net_if.h": "c",
-        "certs.h": "c"
+        "certs.h": "c",
+        "stdarg.h": "c",
+        "lualib.h": "c",
+        "lua.h": "c",
+        "fatal.h": "c",
+        "cmath": "c",
+        "times.h": "c"
     }
 }

@@ -1,5 +1,6 @@
 # Zephyr RTOS and QEMU emulator
 
+- [**LUA specific readme**](./lua.md)
 - [AWS specific readme](./aws.md)
 
 ## Installation
