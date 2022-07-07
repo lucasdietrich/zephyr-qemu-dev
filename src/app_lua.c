@@ -11,6 +11,8 @@
 #include <lua/lauxlib.h>
 #include <lua/lualib.h>
 
+#include <fs/fs.h>
+
 #include "app_fs.h"
 
 #include <logging/log.h>
@@ -41,7 +43,7 @@ int _link(const char *oldpath, const char *newpath)
 }
 #endif
 
-int app_lua_test(void)
+int app_lua_string_test(void)
 {
 	int res;
 	printk("LUA starting ...\n");
@@ -58,4 +60,19 @@ int app_lua_test(void)
 	printk("LUA done ... : %d\n", res);
 
 	return 0;
+}
+
+int app_lua_execute_script(const char *name)
+{
+	int res;
+
+	lua_State *L = luaL_newstate();
+	luaL_openlibs(L);
+
+	res = luaL_loadfile(L, name);
+	lua_pcall(L, 0, LUA_MULTRET, 0);
+
+	lua_close(L);
+
+	return res;
 }

@@ -42,6 +42,8 @@
         "string.h": "c",
         "device.h": "c",
         "lauxlib.h": "c",
-        "littlefs.h": "c"
+        "littlefs.h": "c",
+        "typeinfo": "c",
+        "cstdio": "c"
     }
 }
