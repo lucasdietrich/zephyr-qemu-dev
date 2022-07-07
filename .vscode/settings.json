@@ -37,6 +37,11 @@
         "lua.h": "c",
         "fatal.h": "c",
         "cmath": "c",
-        "times.h": "c"
+        "times.h": "c",
+        "assert.h": "c",
+        "string.h": "c",
+        "device.h": "c",
+        "lauxlib.h": "c",
+        "littlefs.h": "c"
     }
 }

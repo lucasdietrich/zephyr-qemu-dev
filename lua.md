@@ -12,6 +12,9 @@
 - Concurrent scripts execution
 - Compile LUA scripts into bytecode and run them (luac ?)
 
+Ideas:
+- Maybe disable some unecessary modules, like file ?
+
 ## Notes
 
 - `lua_checkstack`
