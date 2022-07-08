@@ -1,5 +1,12 @@
 # LUA
 
+- Tested with following versions of Zephyr RTOS:
+  - v2.7.2
+  - v3.1.0
+
+- And following versions of LUA
+  - 5.4.4
+
 ## Steps:
 
 - ~~Link it with the application (and turn LUA into a zephyr module)~~

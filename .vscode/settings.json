@@ -44,6 +44,7 @@
         "lauxlib.h": "c",
         "littlefs.h": "c",
         "typeinfo": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "fs.h": "c"
     }
 }
