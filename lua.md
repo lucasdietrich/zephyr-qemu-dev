@@ -25,6 +25,16 @@ Ideas:
 - Check how to pass arguments to lua scripts, and to get values
 - Check how to allocate heap/stack for a lua script
 
+## Dynamic allocation
+
+- Check `luaM_malloc_` function
+> Note that Standard C ensures that free(NULL) has no effect and that realloc(NULL,size) is equivalent to malloc(size).
+
+In zephyr RTOS, if MMU is disabled `newlibc` heap starts after the linker `_end` symbol until end of the RAM.
+
+But we can ensure we have enough heap by defining CONFIG_NEWLIB_LIBC_MIN_REQUIRED_HEAP_SIZE Kconfig option.
+
+
 ## Notes
 
 - `lua_checkstack`

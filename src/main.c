@@ -32,7 +32,7 @@ struct emblua
 
 /* find a way to somehow automatically generate this list */
 DECLARE_EMB_LUA_SCRIPT(helloworld);
-DECLARE_EMB_LUA_SCRIPT(script1);
+DECLARE_EMB_LUA_SCRIPT(entry);
 DECLARE_EMB_LUA_SCRIPT(math);
 
 int main(void)
@@ -70,17 +70,17 @@ int main(void)
 		fclose(file);
 	}
 
-	rc = app_lua_execute_script("/lfs/helloworld.lua");
+	// rc = app_lua_execute_script("/lfs/helloworld.lua");
+	// LOG_INF("Executed script rc: %d", rc);
+
+	rc = app_lua_execute_script("/lfs/entry.lua");
 	LOG_INF("Executed script rc: %d", rc);
 
-	rc = app_lua_execute_script("/lfs/script1.lua");
-	LOG_INF("Executed script rc: %d", rc);
+	// rc = app_lua_execute_script("/lfs/math.lua");
+	// LOG_INF("Executed script rc: %d", rc);
 
-	rc = app_lua_execute_script("/lfs/math.lua");
-	LOG_INF("Executed script rc: %d", rc);
-
-	rc = app_lua_execute_script("/lfs/notexistingscript.lua");
-	LOG_INF("Executed script rc: %d", rc);
+	// rc = app_lua_execute_script("/lfs/notexistingscript.lua");
+	// LOG_INF("Executed script rc: %d", rc);
 
 	LOG_INF("App done, rc = %d", rc);
 
