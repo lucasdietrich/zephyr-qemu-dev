@@ -10,3 +10,4 @@ print("ok")
 
 -- calling another lua script
 dofile("/lfs/helloworld.lua")
+dofile("/lfs/math.lua")
