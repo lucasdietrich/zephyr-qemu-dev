@@ -2,7 +2,7 @@
 
 - **[LUA branch](https://github.com/lucasdietrich/zephyr-qemu-dev/tree/lua) WIP**
 - [AWS specific readme](./aws.md)
-
+- [FS branch](https://github.com/lucasdietrich/zephyr-qemu-dev/tree/fs)
 ## Installation
 
 1. Import this project using west
