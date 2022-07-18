@@ -1,3 +1,5 @@
+/delete-node/ &storage_partition;
+
 / {
 	fstab {
 		compatible = "zephyr,fstab";
@@ -13,4 +15,13 @@
 			block-cycles = <512>;
 		};
 	};
+};
+
+&flash_sim0 {
+	partitions {
+		storage_partition: partition@1000 {
+			label = "storage";
+			reg = <0x00001000 0x00080000>;
+		};
+    };
 };
