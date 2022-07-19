@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2022 Lucas Dietrich
  * Copyright (c) 2022 Lukasz Majewski, DENX Software Engineering GmbH
  * Copyright (c) 2019 Peter Bigot Consulting, LLC
  *
@@ -11,11 +12,15 @@
 
 #include <zephyr.h>
 #include <device.h>
+
 #include <fs/fs.h>
 #include <fs/littlefs.h>
-#include <logging/log.h>
-#include <storage/flash_map.h>
+#include <ff.h>
 
+#include <storage/flash_map.h>
+#include <storage/disk_access.h>
+
+#include <logging/log.h>
 LOG_MODULE_REGISTER(app_fs, LOG_LEVEL_DBG);
 
 static int lsdir(const char *path)
@@ -86,11 +91,14 @@ static int littlefs_flash_erase(unsigned int id)
 	flash_area_close(pfa);
 	return rc;
 }
-#define PARTITION_NODE DT_NODELABEL(lfs1)
 
-#if DT_NODE_EXISTS(PARTITION_NODE)
-FS_FSTAB_DECLARE_ENTRY(PARTITION_NODE);
-#else /* PARTITION_NODE */
+/* LittleFS mount point */
+#define LFS_PARTITION_NODE DT_NODELABEL(lfs1)
+#define FATFS_PARTITION_NODE DT_NODELABEL(fatfs1)
+
+#if DT_NODE_EXISTS(LFS_PARTITION_NODE)
+FS_FSTAB_DECLARE_ENTRY(LFS_PARTITION_NODE);
+#else /* LFS_PARTITION_NODE */
 FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(storage);
 static struct fs_mount_t lfs_storage_mnt = {
 	.type = FS_LITTLEFS,
@@ -98,15 +106,25 @@ static struct fs_mount_t lfs_storage_mnt = {
 	.storage_dev = (void *)FLASH_AREA_ID(storage),
 	.mnt_point = "/lfs",
 };
-#endif /* PARTITION_NODE */
+#endif /* LFS_PARTITION_NODE */
 
 	struct fs_mount_t *mp =
-#if DT_NODE_EXISTS(PARTITION_NODE)
-		&FS_FSTAB_ENTRY(PARTITION_NODE)
+#if DT_NODE_EXISTS(LFS_PARTITION_NODE)
+		&FS_FSTAB_ENTRY(LFS_PARTITION_NODE)
 #else
 		&lfs_storage_mnt
 #endif
 		;
+
+/* FATFS mount point */
+static FATFS fat_fs;
+
+static struct fs_mount_t mp2 = {
+	.type = FS_FATFS,
+	.fs_data = &fat_fs,
+};
+
+static const char *disk_mount_pt = "/RAM:";
 
 int fs_stats(void)
 {
@@ -137,7 +155,55 @@ exit:
 	return rc;
 }
 
-int fs_init(void)
+static int fatfs_mount(void)
+{
+	int rc;
+
+	/* raw disk i/o */
+	do {
+		static const char *disk_pdrv = "RAM";
+		uint64_t memory_size_mb;
+		uint32_t block_count;
+		uint32_t block_size;
+
+		if (disk_access_init(disk_pdrv) != 0) {
+			LOG_ERR("Storage init ERROR!");
+			break;
+		}
+
+		if (disk_access_ioctl(disk_pdrv,
+				DISK_IOCTL_GET_SECTOR_COUNT, &block_count)) {
+			LOG_ERR("Unable to get sector count");
+			break;
+		}
+		LOG_INF("Block count %u", block_count);
+
+		if (disk_access_ioctl(disk_pdrv,
+				DISK_IOCTL_GET_SECTOR_SIZE, &block_size)) {
+			LOG_ERR("Unable to get sector size");
+			break;
+		}
+		printk("Sector size %u\n", block_size);
+
+		memory_size_mb = (uint64_t)block_count * block_size;
+		printk("Memory Size(MB) %u\n", (uint32_t)(memory_size_mb >> 20));
+	} while (0);
+
+	mp2.mnt_point = disk_mount_pt;
+
+	rc = fs_mount(&mp2);
+
+	if (rc == FR_OK) {
+		printk("Disk mounted.\n");
+		lsdir(disk_mount_pt);
+	} else {
+		printk("Error mounting disk.\n");
+	}
+
+	return rc;
+}
+
+static int littlefs_mount(void)
 {
 	int rc;
 
@@ -147,8 +213,8 @@ int fs_init(void)
 	}
 
 	/* Do not mount if auto-mount has been enabled */
-#if !DT_NODE_EXISTS(PARTITION_NODE) ||						\
-	!(FSTAB_ENTRY_DT_MOUNT_FLAGS(PARTITION_NODE) & FS_MOUNT_FLAG_AUTOMOUNT)
+#if !DT_NODE_EXISTS(LFS_PARTITION_NODE) ||						\
+	!(FSTAB_ENTRY_DT_MOUNT_FLAGS(LFS_PARTITION_NODE) & FS_MOUNT_FLAG_AUTOMOUNT)
 	rc = fs_mount(mp);
 	if (rc < 0) {
 		LOG_INF("FAIL: mount id %" PRIuPTR " at %s: %d",
@@ -159,6 +225,20 @@ int fs_init(void)
 #else
 	LOG_INF("%s automounted", mp->mnt_point);
 #endif
+
+	return rc;
+}
+
+int fs_init(void)
+{
+	int rc;
+
+	rc = fatfs_mount();
+	if (rc < 0) {
+		return rc;
+	}
+
+	rc = littlefs_mount();
 
 	return rc;
 }

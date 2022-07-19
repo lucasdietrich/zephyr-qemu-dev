@@ -23,5 +23,15 @@
 			label = "storage";
 			reg = <0x00001000 0x00080000>;
 		};
+
+		/* Todo, use this partition with FATFS NAND: (DISK_DRIVER_FLASH) 
+		 * With big sector size
+		 * erase-block-size = < 0x400 >;
+		 * write-block-size = < 0x4 >;
+		 */
+		storage_partition2: partition@81000 {
+			label = "storage2";
+			reg = <0x00081000 0x00040000>;
+		};
     };
 };
